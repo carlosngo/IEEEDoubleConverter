@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="355.0" prefWidth="803.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="grp1Topic8.UIController">
+   <children>
+      <TextField fx:id="baseTwo" layoutX="194.0" layoutY="100.0" prefHeight="39.0" prefWidth="486.0" />
+      <TextField fx:id="binary" layoutX="151.0" layoutY="213.0" prefHeight="39.0" prefWidth="639.0" />
+      <Label layoutX="194.0" layoutY="68.0" text="Enter binary mantissa:" />
+      <Label layoutX="151.0" layoutY="178.0" text="Binary Output with Space:" />
+      <Label layoutX="17.0" layoutY="14.0" text="IEEE Double-Precision Binary-64 Converter " />
+      <Label layoutX="151.0" layoutY="259.0" text="Hexadecimal answer:" />
+      <Button fx:id="clearData" layoutX="17.0" layoutY="213.0" mnemonicParsing="false" onMouseClicked="#witnessResult" prefHeight="39.0" prefWidth="112.0" text="Clear" />
+      <Button fx:id="submit" layoutX="17.0" layoutY="100.0" mnemonicParsing="false" onMouseClicked="#giveIn" prefHeight="39.0" prefWidth="112.0" text="Submit" />
+      <TextField fx:id="hex" layoutX="151.0" layoutY="295.0" prefHeight="39.0" prefWidth="639.0" />
+      <Label layoutX="703.0" layoutY="99.0" text="x2">
+         <font>
+            <Font name="Arial" size="36.0" />
+         </font>
+      </Label>
+      <TextField fx:id="eNotPrime" layoutX="742.0" layoutY="73.0" prefHeight="39.0" prefWidth="47.0" />
+      <Label layoutX="660.0" layoutY="41.0" text="Enter Exponent:" />
+      <TextField fx:id="sign" layoutX="145.0" layoutY="100.0" prefHeight="39.0" prefWidth="39.0" />
+      <Label layoutX="144.0" layoutY="68.0" text="+/-" />
+      <Label layoutX="17.0" layoutY="259.0" text="Special Case:" />
+      <TextField fx:id="typeOfSpecial" layoutX="17.0" layoutY="295.0" prefHeight="39.0" prefWidth="112.0" promptText="none" />
+   </children>
+</AnchorPane>
