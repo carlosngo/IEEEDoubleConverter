@@ -169,15 +169,9 @@ public class ConverterController {
                 hexAnswer.setText(getHex(output));
             }
             else{
-                if((inputSign.getText() == "") || (beforeDot.getText() == "") || (afterDot.getText() == "")
-                        || (exponentSign.getText() == "") || (exponent.getText() == "")){
-
-                }
-                else{
-                    String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
-                    binaryAnswer.setText(output);
-                    hexAnswer.setText(getHex(output));
-                }
+                String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
+                binaryAnswer.setText(output);
+                hexAnswer.setText(getHex(output));
             }
         });
 
@@ -230,8 +224,9 @@ public class ConverterController {
                 newMantissa.append(mantissa.substring(mantissaIndex + 1));
             }
         }
-        if(exponentSign == "-")
-            newExponent *= -1;
+        if(exponentSign.equals("-")){
+            newExponent *= (-1);
+        }
         int ePrime = newExponent + 1023;
         System.out.println(ePrime);
         if (ePrime >= 2047) { // Infinity
@@ -255,32 +250,6 @@ public class ConverterController {
         return output.toString();
     }
 
-//    private static String binaryToHex(String binary) {
-//        int decimalValue = 0;
-//        int length = binary.length() - 1;
-//        for (int i = 0; i < binary.length(); i++) {
-//            decimalValue += Integer.parseInt(binary.charAt(i) + "") * Math.pow(2, length);
-//            length--;
-//        }
-//        return decimalToHex(decimalValue);
-//    }
-//    private static String decimalToHex(int decimal){
-//        String hex = "";
-//        while (decimal != 0){
-//            int hexValue = decimal % 16;
-//            hex = toHexChar(hexValue) + hex;
-//            decimal = decimal / 16;
-//        }
-//        return hex;
-//    }
-//
-//    private static char toHexChar(int hexValue) {
-//        if (hexValue <= 9 && hexValue >= 0)
-//            return (char)(hexValue + '0');
-//        else
-//            return (char)(hexValue - 10 + 'A');
-//    }
-
     public String getHex(String b) {
         int index = 0;
         String binary = b;
@@ -292,13 +261,10 @@ public class ConverterController {
             }
             index += 4;
         }
-        return binaryToHex(binaryCharArray);
-    }
 
-    public String binaryToHex(String[] bin) {
-        String[] result = new String[bin.length];
-        for (int i = 0; i < bin.length; i++) {
-            result[i] = Integer.toHexString(Integer.parseInt(bin[i], 2));
+        String[] result = new String[binaryCharArray.length];
+        for (int i = 0; i < binaryCharArray.length; i++) {
+            result[i] = Integer.toHexString(Integer.parseInt(binaryCharArray[i], 2));
         }
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < result.length; i++) {
