@@ -1,7 +1,130 @@
 package Controller;
 
-public class ConverterController {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.event.EventHandler;
+import javax.swing.*;
 
+public class ConverterController {
+    @FXML
+    TextField inputSign;
+    @FXML
+    TextField beforeDot;
+    @FXML
+    TextField afterDot;
+    @FXML
+    TextField exponentSign;
+    @FXML
+    TextField exponent;
+    @FXML
+    RadioButton sNaNButton;
+    @FXML
+    RadioButton qNaNButton;
+    @FXML
+    Button clear;
+    @FXML
+    Button convert;
+    @FXML
+    Label binaryAnswer;
+    @FXML
+    Label hexAnswer;
+
+    public void initialize(){
+        beforeDot.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (!"01".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            }
+        });
+        afterDot.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (!"01".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            }
+        });
+        inputSign.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (!"+-".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            }
+        });
+        exponentSign.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (!"+-".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            }
+        });
+        exponent.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent keyEvent) {
+                if (!"0123456789".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            }
+        });
+
+        convert.setOnAction(event -> {
+            String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText());
+            binaryAnswer.setText(output);
+        });
+
+        clear.setOnAction(event -> {
+
+        });
+
+//        ActionListener qNaNListener = new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                inputSign.setEditable(false);
+//                beforeDot.setEditable(false);
+//                afterDot.setEditable(false);
+//                exponentSign.setEditable(false);
+//                exponent.setEditable(false);
+//                String output = convert(true);
+//                binaryAnswer.setText(output);
+//            }
+//        };
+//        qNaNButton.addActionListener(qNaNListener);
+//
+//        ActionListener sNaNListener = new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                inputSign.setEditable(false);
+//                beforeDot.setEditable(false);
+//                afterDot.setEditable(false);
+//                exponentSign.setEditable(false);
+//                exponent.setEditable(false);
+//                String output = convert(true);
+//                binaryAnswer.setText(output);
+//            }
+//        };
+//        sNaNButton.addActionListener(sNaNListener);
+    }
+
+    @FXML
+    protected void clear(ActionEvent event) {
+        inputSign.setEditable(true);
+        beforeDot.setEditable(true);
+        afterDot.setEditable(true);
+        exponentSign.setEditable(true);
+        exponent.setEditable(true);
+        binaryAnswer.setText("");
+        hexAnswer.setText("");
+    }
     public String convert(boolean isQNaN) {
         StringBuilder output = new StringBuilder("0");
         for (int i = 0; i < 11; i++) output.append('1');
@@ -53,13 +176,5 @@ public class ConverterController {
             output.append('0');
         }
         return output.toString();
-    }
-
-    public static void main(String[] args) {
-//        String binary = new ConverterController().convert("+", "0", "001011", "-1020");
-//        String binary = new ConverterController().convert(false);
-//        System.out.println(binary.length());
-//        System.out.println(binary);
-
     }
 }
