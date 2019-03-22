@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.event.EventHandler;
 import javax.swing.*;
@@ -44,6 +44,7 @@ public class ConverterController {
                 }
             }
         });
+
         afterDot.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -52,22 +53,25 @@ public class ConverterController {
                 }
             }
         });
+
         inputSign.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (!"+-".contains(keyEvent.getCharacter())) {
+                if (!"+-".contains(keyEvent.getCharacter()) || inputSign.getText().length()>=1) {
                     keyEvent.consume();
                 }
             }
         });
+
         exponentSign.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (!"+-".contains(keyEvent.getCharacter())) {
+                if (!"+-".contains(keyEvent.getCharacter()) || inputSign.getText().length()>=1) {
                     keyEvent.consume();
                 }
             }
         });
+
         exponent.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -83,36 +87,38 @@ public class ConverterController {
         });
 
         clear.setOnAction(event -> {
-
+            inputSign.setEditable(true);
+            beforeDot.setEditable(true);
+            afterDot.setEditable(true);
+            exponentSign.setEditable(true);
+            exponent.setEditable(true);
+            binaryAnswer.setText("");
+            hexAnswer.setText("");
         });
 
-//        ActionListener qNaNListener = new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                inputSign.setEditable(false);
-//                beforeDot.setEditable(false);
-//                afterDot.setEditable(false);
-//                exponentSign.setEditable(false);
-//                exponent.setEditable(false);
-//                String output = convert(true);
-//                binaryAnswer.setText(output);
-//            }
-//        };
-//        qNaNButton.addActionListener(qNaNListener);
-//
-//        ActionListener sNaNListener = new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                inputSign.setEditable(false);
-//                beforeDot.setEditable(false);
-//                afterDot.setEditable(false);
-//                exponentSign.setEditable(false);
-//                exponent.setEditable(false);
-//                String output = convert(true);
-//                binaryAnswer.setText(output);
-//            }
-//        };
-//        sNaNButton.addActionListener(sNaNListener);
+        ToggleGroup toggleGroup = new ToggleGroup();
+
+        sNaNButton.setToggleGroup(toggleGroup);
+        qNaNButton.setToggleGroup(toggleGroup);
+
+        if(toggleGroup.getSelectedToggle() == qNaNButton){
+            inputSign.setEditable(false);
+            beforeDot.setEditable(false);
+            afterDot.setEditable(false);
+            exponentSign.setEditable(false);
+            exponent.setEditable(false);
+            String output = convert(true);
+            binaryAnswer.setText(output);
+        }
+        else {
+            inputSign.setEditable(false);
+            beforeDot.setEditable(false);
+            afterDot.setEditable(false);
+            exponentSign.setEditable(false);
+            exponent.setEditable(false);
+            String output = convert(false);
+            binaryAnswer.setText(output);
+        }
     }
 
     @FXML
