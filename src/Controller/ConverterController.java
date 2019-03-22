@@ -1,5 +1,6 @@
 package Controller;
 
+import javafx.beans.binding.*;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -33,6 +34,9 @@ public class ConverterController {
     Label hexAnswer;
 
     public void initialize(){
+
+        convert.setDisable(true);
+
         inputSign.setEditable(true);
         beforeDot.setEditable(true);
         afterDot.setEditable(true);
@@ -40,6 +44,27 @@ public class ConverterController {
         exponent.setEditable(true);
         binaryAnswer.setText("");
         hexAnswer.setText("");
+
+        BooleanBinding bb = new BooleanBinding() {
+            {
+                super.bind(inputSign.textProperty(),
+                        beforeDot.textProperty(),
+                        afterDot.textProperty(),
+                        exponentSign.textProperty(),
+                        exponent.textProperty());
+            }
+
+            @Override
+            protected boolean computeValue() {
+                return (inputSign.getText().isEmpty()
+                        || beforeDot.getText().isEmpty()
+                        || afterDot.getText().isEmpty()
+                        || exponentSign.getText().isEmpty()
+                        || exponent.getText().isEmpty());
+            }
+        };
+
+        convert.disableProperty().bind(bb);
 
         beforeDot.addEventFilter(KeyEvent.KEY_TYPED, new EventHandler<KeyEvent>() {
             @Override
@@ -144,9 +169,15 @@ public class ConverterController {
                 hexAnswer.setText(getHex(output));
             }
             else{
-                String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getHex(output));
+                if((inputSign.getText() == "") || (beforeDot.getText() == "") || (afterDot.getText() == "")
+                        || (exponentSign.getText() == "") || (exponent.getText() == "")){
+
+                }
+                else{
+                    String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
+                    binaryAnswer.setText(output);
+                    hexAnswer.setText(getHex(output));
+                }
             }
         });
 
