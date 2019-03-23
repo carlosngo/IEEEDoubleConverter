@@ -127,19 +127,35 @@ public class ConverterController {
 
         toggleGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) ->
         {
-            if ((toggleGroup.getSelectedToggle() == qNaNButton) || (toggleGroup.getSelectedToggle() == sNaNButton)){
+            if (toggleGroup.getSelectedToggle() == qNaNButton){
                 inputSign.setEditable(false);
                 beforeDot.setEditable(false);
                 afterDot.setEditable(false);
                 exponentSign.setEditable(false);
                 exponent.setEditable(false);
-                binaryAnswer.setText("");
-                hexAnswer.setText("");
                 beforeDot.setText("");
                 afterDot.setText("");
                 inputSign.setText("");
                 exponentSign.setText("");
                 exponent.setText("");
+                String output = convert(true, exponentSign.getText());
+                binaryAnswer.setText(output);
+                hexAnswer.setText(getHex(output));
+            }
+            else if (toggleGroup.getSelectedToggle() == sNaNButton){
+                inputSign.setEditable(false);
+                beforeDot.setEditable(false);
+                afterDot.setEditable(false);
+                exponentSign.setEditable(false);
+                exponent.setEditable(false);
+                beforeDot.setText("");
+                afterDot.setText("");
+                inputSign.setText("");
+                exponentSign.setText("");
+                exponent.setText("");
+                String output = convert(false, exponentSign.getText());
+                binaryAnswer.setText(output);
+                hexAnswer.setText(getHex(output));
             }
             else {
                 inputSign.setEditable(true);
@@ -158,21 +174,9 @@ public class ConverterController {
         });
 
         convert.setOnAction(event -> {
-            if(toggleGroup.getSelectedToggle() == qNaNButton){
-                String output = convert(true);
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getHex(output));
-            }
-            else if(toggleGroup.getSelectedToggle() == sNaNButton){
-                String output = convert(false);
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getHex(output));
-            }
-            else{
-                String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getHex(output));
-            }
+            String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText());
+            binaryAnswer.setText(output);
+            hexAnswer.setText(getHex(output));
         });
 
         clear.setOnAction(event -> {
@@ -194,9 +198,15 @@ public class ConverterController {
 
     }
 
-    public String convert(boolean isQNaN) {
-        StringBuilder output = new StringBuilder("0");
+    public String convert(boolean isQNaN, String exponentSign) {
+        StringBuilder output;
+        if(exponentSign.equals("-"))
+            output = new StringBuilder("1");
+        else
+            output = new StringBuilder("0");
+        output.append("  ");
         for (int i = 0; i < 11; i++) output.append('1');
+        output.append("  ");
         if (isQNaN) output.append('1');
         else output.append('0');
         for (int i = 0; i < 51; i++) output.append('1');
@@ -224,29 +234,39 @@ public class ConverterController {
                 newMantissa.append(mantissa.substring(mantissaIndex + 1));
             }
         }
+
         if(exponentSign.equals("-")){
             newExponent *= (-1);
         }
+
         int ePrime = newExponent + 1023;
         System.out.println(ePrime);
         if (ePrime >= 2047) { // Infinity
+            output.append("  ");
             for (int i = 0; i < 11; i++) output.append('1');
+            output.append("  ");
             for (int i = 0; i < 52; i++) output.append('0');
             return output.toString();
         }
         if (ePrime <= 0) { // Denormalized
-            for (int i = 0; i < 62; i++) output.append('0');
+            output.append("  ");
+            for (int i = 0; i < 11; i++) output.append('0');
+            output.append("  ");
+            for (int i = 0; i < 52; i++) output.append('0');
             output.append('1');
             return output.toString();
         }
         String ePrimeBinary = Integer.toBinaryString(ePrime);
         for (int i = 0; i < 11 - ePrimeBinary.length(); i++) output.append('0');
+        output.append("  ");
         output.append(ePrimeBinary);
+        output.append("  ");
         output.append(newMantissa.toString());
 
         while (output.length() < 64) {
             output.append('0');
         }
+
         return output.toString();
     }
 
