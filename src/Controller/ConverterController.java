@@ -227,6 +227,8 @@ public class ConverterController {
         if (sign.equals("+")) output.append("0");
         else output.append("1");
         int newExponent = Integer.parseInt(exponent);
+        if(exponentSign.equals("-")) newExponent *= (-1);
+
         StringBuilder newMantissa = new StringBuilder();
         int wholeIndex = whole.indexOf('1'); // index of 1 in whole
         int mantissaIndex = mantissa.indexOf('1'); // index of 1 in mantissa
@@ -243,10 +245,6 @@ public class ConverterController {
                 newExponent -= mantissaIndex + 1;
                 newMantissa.append(mantissa.substring(mantissaIndex + 1));
             }
-        }
-
-        if(exponentSign.equals("-")){
-            newExponent *= (-1);
         }
 
         int ePrime = newExponent + 1023;
