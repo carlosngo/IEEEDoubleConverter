@@ -9,6 +9,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.event.*;
 
+
 public class ConverterController {
     @FXML
     TextField inputSign;
@@ -139,8 +140,8 @@ public class ConverterController {
                 exponentSign.setText("");
                 exponent.setText("");
                 String output = convert(true, exponentSign.getText());
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getNaNHex(true, exponentSign.getText()));
+                binaryAnswer.setText(output.substring(0, 64));
+                hexAnswer.setText(output.substring(64));
             }
             else if (toggleGroup.getSelectedToggle() == sNaNButton){
                 inputSign.setEditable(false);
@@ -154,8 +155,8 @@ public class ConverterController {
                 exponentSign.setText("");
                 exponent.setText("");
                 String output = convert(false, exponentSign.getText());
-                binaryAnswer.setText(output);
-                hexAnswer.setText(getNaNHex(false, exponentSign.getText()));
+                binaryAnswer.setText(output.substring(0, 64));
+                hexAnswer.setText(output.substring(64));
             }
             else {
                 inputSign.setEditable(true);
@@ -174,8 +175,16 @@ public class ConverterController {
         });
 
         convert.setOnAction(event -> {
-            binaryAnswer.setText(convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText()));
-            hexAnswer.setText(getHex(inputSign.getText(), beforeDot.getText(), afterDot.getText(), exponent.getText(), exponentSign.getText()));
+            String output = convert(inputSign.getText(), beforeDot.getText(), afterDot.getText(),
+                                    exponent.getText(), exponentSign.getText());
+            StringBuilder binary = new StringBuilder(output.substring(0, 1));
+            binary.append("  ");
+            binary.append(output, 1, 12);
+            binary.append("  ");
+            binary.append(output, 12, 64);
+            System.out.println(binary.length());
+            binaryAnswer.setText(binary.toString());
+            hexAnswer.setText(output.substring(64));
         });
 
         clear.setOnAction(event -> {
@@ -203,45 +212,14 @@ public class ConverterController {
             output = new StringBuilder("1");
         else
             output = new StringBuilder("0");
-        output.append("  ");
         for (int i = 0; i < 11; i++) output.append('1');
-        output.append("  ");
         if (isQNaN) output.append('1');
         else output.append('0');
         for (int i = 0; i < 51; i++) output.append('1');
+
+        output.append(toHex(output.toString()));
+
         return output.toString();
-    }
-
-    public String getNaNHex(boolean isQNaN, String exponentSign) {
-        StringBuilder output;
-        if(exponentSign.equals("-"))
-            output = new StringBuilder("1");
-        else
-            output = new StringBuilder("0");
-        for (int i = 0; i < 11; i++) output.append('1');
-        if (isQNaN) output.append('1');
-        else output.append('0');
-        for (int i = 0; i < 51; i++) output.append('1');
-        int index = 0;
-        String binary = output.toString();
-        String[] binaryCharArray = new String[binary.length() / 4];
-        for (int i = 0; i < binary.length() / 4; i++) {
-            binaryCharArray[i] = "";
-            for (int j = index; j < index + 4; j++) {
-                binaryCharArray[i] += binary.charAt(j);
-            }
-            index += 4;
-        }
-
-        String[] result = new String[binaryCharArray.length];
-        for (int i = 0; i < binaryCharArray.length; i++) {
-            result[i] = Integer.toHexString(Integer.parseInt(binaryCharArray[i], 2));
-        }
-        StringBuilder hex = new StringBuilder();
-        for (int i = 0; i < result.length; i++) {
-            hex.append(result[i].toUpperCase());
-        }
-        return hex.toString();
     }
 
     public String convert(String sign, String whole, String mantissa, String exponent, String exponentSign) {
@@ -259,6 +237,7 @@ public class ConverterController {
         } else {
             if (mantissaIndex == -1) { // 0.0
                 for (int i = 0; i < 63; i++) output.append('0');
+                output.append(toHex(output.toString()));
                 return output.toString();
             } else {
                 newExponent -= mantissaIndex + 1;
@@ -273,104 +252,45 @@ public class ConverterController {
         int ePrime = newExponent + 1023;
         System.out.println(ePrime);
         if (ePrime >= 2047) { // Infinity
-            output.append("  ");
             for (int i = 0; i < 11; i++) output.append('1');
-            output.append("  ");
             for (int i = 0; i < 52; i++) output.append('0');
+            output.append(toHex(output.toString()));
             return output.toString();
         }
         if (ePrime <= 0) { // Denormalized
-            output.append("  ");
             for (int i = 0; i < 11; i++) output.append('0');
-            output.append("  ");
-            for (int i = 0; i < 52; i++) output.append('0');
-            output.append('1');
+            StringBuilder denormalizedMantissa = new StringBuilder();
+            while (ePrime < 0) {
+                denormalizedMantissa.append('0');
+                ePrime++;
+            }
+            denormalizedMantissa.append('1');
+            denormalizedMantissa.append(newMantissa.toString());
+            while (denormalizedMantissa.length() < 52) denormalizedMantissa.append('0');
+            output.append(denormalizedMantissa.substring(0, 52));
+            output.append(toHex(output.toString()));
             return output.toString();
         }
-        output.append("  ");
         String ePrimeBinary = Integer.toBinaryString(ePrime);
         for (int i = 0; i < 11 - ePrimeBinary.length(); i++) output.append('0');
         output.append(ePrimeBinary);
-        output.append("  ");
         output.append(newMantissa.toString());
 
-        while (output.length() < 64) {
-            output.append('0');
-        }
+        while (output.length() < 64) output.append('0');
 
+        output.append(toHex(output.toString()));
         return output.toString();
     }
 
-    public String getHex(String sign, String whole, String mantissa, String exponent, String exponentSign) {
-        StringBuilder output = new StringBuilder();
-        if (sign.equals("+")) output.append("0");
-        else output.append("1");
-        int newExponent = Integer.parseInt(exponent);
-        StringBuilder newMantissa = new StringBuilder();
-        int wholeIndex = whole.indexOf('1'); // index of 1 in whole
-        int mantissaIndex = mantissa.indexOf('1'); // index of 1 in mantissa
-        if (wholeIndex != -1) {
-            newExponent += whole.length() - wholeIndex - 1;
-            newMantissa.append(whole.substring(wholeIndex + 1));
-            newMantissa.append(mantissa);
-        } else {
-            if (mantissaIndex == -1) { // 0.0
-                for (int i = 0; i < 63; i++) output.append('0');
-                return output.toString();
-            } else {
-                newExponent -= mantissaIndex + 1;
-                newMantissa.append(mantissa.substring(mantissaIndex + 1));
-            }
-        }
-
-        if(exponentSign.equals("-")){
-            newExponent *= (-1);
-        }
-
-        int ePrime = newExponent + 1023;
-        System.out.println(ePrime);
-        if (ePrime >= 2047) { // Infinity
-            for (int i = 0; i < 11; i++) output.append('1');
-            for (int i = 0; i < 52; i++) output.append('0');
-            return output.toString();
-        }
-        if (ePrime <= 0) { // Denormalized
-            for (int i = 0; i < 11; i++) output.append('0');
-            for (int i = 0; i < 52; i++) output.append('0');
-            output.append('1');
-            return output.toString();
-        }
-        String ePrimeBinary = Integer.toBinaryString(ePrime);
-        for (int i = 0; i < 11 - ePrimeBinary.length(); i++) output.append('0');
-        output.append(ePrimeBinary);
-        output.append(newMantissa.toString());
-
-        while (output.length() < 64) {
-            output.append('0');
-        }
-
-        int index = 0;
-        String binary = output.toString();
-        String[] binaryCharArray = new String[binary.length() / 4];
-        for (int i = 0; i < binary.length() / 4; i++) {
-            binaryCharArray[i] = "";
-            for (int j = index; j < index + 4; j++) {
-                binaryCharArray[i] += binary.charAt(j);
-            }
-            index += 4;
-        }
-
-        String[] result = new String[binaryCharArray.length];
-        for (int i = 0; i < binaryCharArray.length; i++) {
-            result[i] = Integer.toHexString(Integer.parseInt(binaryCharArray[i], 2));
-        }
+    public String toHex(String binaryString) {
         StringBuilder hex = new StringBuilder();
-        for (int i = 0; i < result.length; i++) {
-            hex.append(result[i].toUpperCase());
+        for (int i = 0; i < binaryString.length(); i += 4) {
+            int val = Integer.parseInt(binaryString.substring(i, i + 4), 2);
+            if (val > 9) hex.append((char)('A' + val - 10));
+            else hex.append((char)(val + '0'));
         }
         return hex.toString();
     }
-
     public class RadioButtonSelectionHandler  {
 
         private boolean selected = false;
