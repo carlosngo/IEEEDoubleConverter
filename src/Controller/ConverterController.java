@@ -139,8 +139,13 @@ public class ConverterController {
                 inputSign.setText("");
                 exponentSign.setText("");
                 exponent.setText("");
-                String output = convert(true, exponentSign.getText());
-                binaryAnswer.setText(output.substring(0, 64));
+                String output = convert(true);
+                StringBuilder binary = new StringBuilder(output.substring(0, 1));
+                binary.append("  ");
+                binary.append(output, 1, 12);
+                binary.append("  ");
+                binary.append(output, 12, 64);
+                binaryAnswer.setText(binary.toString());
                 hexAnswer.setText(output.substring(64));
             }
             else if (toggleGroup.getSelectedToggle() == sNaNButton){
@@ -154,8 +159,13 @@ public class ConverterController {
                 inputSign.setText("");
                 exponentSign.setText("");
                 exponent.setText("");
-                String output = convert(false, exponentSign.getText());
-                binaryAnswer.setText(output.substring(0, 64));
+                String output = convert(false);
+                StringBuilder binary = new StringBuilder(output.substring(0, 1));
+                binary.append("  ");
+                binary.append(output, 1, 12);
+                binary.append("  ");
+                binary.append(output, 12, 64);
+                binaryAnswer.setText(binary.toString());
                 hexAnswer.setText(output.substring(64));
             }
             else {
@@ -182,7 +192,6 @@ public class ConverterController {
             binary.append(output, 1, 12);
             binary.append("  ");
             binary.append(output, 12, 64);
-            System.out.println(binary.length());
             binaryAnswer.setText(binary.toString());
             hexAnswer.setText(output.substring(64));
         });
@@ -206,12 +215,8 @@ public class ConverterController {
 
     }
 
-    public String convert(boolean isQNaN, String exponentSign) {
-        StringBuilder output;
-        if(exponentSign.equals("-"))
-            output = new StringBuilder("1");
-        else
-            output = new StringBuilder("0");
+    public String convert(boolean isQNaN) {
+        StringBuilder output = new StringBuilder("0");
         for (int i = 0; i < 11; i++) output.append('1');
         if (isQNaN) output.append('1');
         else output.append('0');
